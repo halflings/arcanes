@@ -8,10 +8,10 @@ class GameWindow(pyglet.window.Window):
         super(GameWindow, self).__init__(**kwargs)
 
         init_pos = np.array([self.width/2., self.height/2.])
-        init_vel = np.array([0., 0.])
         color = np.array([50, 190, 230])
-        self.particle_emitter = ParticleEmitter(max_particles=1000, particle_lifetime=2., emission_frequency=500.,
-                                                color=color, position=init_pos, velocity=init_vel)
+        self.particle_emitter = ParticleEmitter(max_particles=2000, particle_lifetime=1., emission_frequency=300.,
+                                                color=color, position=init_pos)
+        self.particle_emitter.emitting = False
 
         # Update event
         self.fps = 145.
@@ -35,7 +35,11 @@ class GameWindow(pyglet.window.Window):
         self.particle_emitter.position = np.array([float(x), float(y)])
 
     def on_mouse_press(self, x, y, button, modifiers):
-        pass
+        self.particle_emitter.position = np.array([float(x), float(y)])
+        self.particle_emitter.emitting = True
+
+    def on_mouse_release(self, x, y, button, modifiers):
+        self.particle_emitter.emitting = False
 
 if __name__ == '__main__':
     window = GameWindow(width=800, height=600)
