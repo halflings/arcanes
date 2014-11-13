@@ -27,16 +27,24 @@ class ParticleEmitter(PhysicalObject):
         self.particle_lifetime = particle_lifetime
 
         self.time_last_emission = 0.
-        self.emitting = True
+        self._emitting = True
         self.particles = list()
+
+    @property
+    def emitting(self):
+        return self._emitting
+    @emitting.setter
+    def emitting(self, value):
+        self._emitting = value
+        self.time_last_emission = 0.
 
     def emit_particle(self):
         color = self.color + np.random.random_integers(100, 200, 3)
         color = 255 * color / max(color)
 
-        speed = 20.
+        speed = 10.
         velocity = np.random.ranf(2) * speed - speed / 2.
-        damping = random.random()
+        damping = 0.5 + 0.5 * random.random()
         position = self.position
         lifetime = self.particle_lifetime * (0.8 + 0.2 * random.random())
         return Particle(color=color, lifetime=lifetime,
@@ -49,14 +57,20 @@ class ParticleEmitter(PhysicalObject):
         scheduled_emissions = int(self.time_last_emission * self.emission_frequency)
         empty_spots = self.max_particles - len(self.particles)
         if empty_spots > 0 and self.emitting and scheduled_emissions > 0:
+            for i, particle in enumerate(self.particles):
+                if not particle.alive:
+                    self.particles[i] = self.emit_particle()
+                    scheduled_emissions -= 1
+                if scheduled_emissions <= 0:
+                    break
+
             for i in xrange(min(scheduled_emissions, empty_spots)):
                 self.particles.append(self.emit_particle())
             self.time_last_emission = 0.
 
         for i, particle in enumerate(self.particles):
-            particle.update(dt)
-            if not particle.alive and self.emitting:
-                self.particles[i] = self.emit_particle()
+            if particle.alive:
+                particle.update(dt)
 
 
     def draw(self):
