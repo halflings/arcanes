@@ -95,11 +95,11 @@ class Particle(PhysicalObject):
     def __init__(self, color, size, lifetime, *args, **kwargs):
         super(Particle, self).__init__(*args, **kwargs)
         self.color = color
-        self.lifetime = lifetime
+        self.max_lifetime = lifetime
+        self.lifetime = self.max_lifetime
         self.size = size
 
         self.vertices = np.hstack([self.position + [-size, size], self.position + [-size, -size], self.position + [size, 0]])
-        self.vertices_colors = np.hstack([self.color] * 3)
 
     def update(self, dt):
         super(Particle, self).update(dt)
@@ -112,7 +112,9 @@ class Particle(PhysicalObject):
         return self.lifetime > 0
 
     def draw(self, batch):
+        alpha = self.lifetime/self.max_lifetime
+        vertices_colors = np.hstack([np.append(self.color/255., alpha)] * 3)
         batch.add(3, pyglet.gl.GL_TRIANGLES, None,
             ('v2f', self.vertices),
-            ('c3B', self.vertices_colors)
+            ('c4f', vertices_colors)
         )
