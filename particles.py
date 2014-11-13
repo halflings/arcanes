@@ -19,10 +19,21 @@ class PhysicalObject(object):
         self.velocity = (1 - self.damping * dt) * self.velocity + dt * self.acceleration
 
 class ParticleEmitter(PhysicalObject):
-    def __init__(self, max_particles, particle_lifetime, emission_frequency, color, *args, **kwargs):
+    MAX_PARTICLES = 1000
+    PARTICLE_LIFETIME = 2.
+    EMISSION_FREQUENCY = 200.
+    COLOR = np.array([50, 190, 230])
+    EMISSION_SPEED = 5.
+    PARTICLE_SIZE = 3
+
+    def __init__(self, max_particles=MAX_PARTICLES, particle_lifetime=PARTICLE_LIFETIME, particle_size=PARTICLE_SIZE,
+                 emission_frequency=EMISSION_FREQUENCY, emission_speed=EMISSION_SPEED, color=COLOR,
+                 *args, **kwargs):
         super(ParticleEmitter, self).__init__(*args, **kwargs)
         self.max_particles = max_particles
         self.emission_frequency = emission_frequency
+        self.emission_speed = emission_speed
+        self.particle_size = particle_size
         self.color = color
         self.particle_lifetime = particle_lifetime
 
@@ -42,12 +53,12 @@ class ParticleEmitter(PhysicalObject):
         color = self.color + np.random.random_integers(100, 200, 3)
         color = 255 * color / max(color)
 
-        speed = 10.
-        velocity = np.random.ranf(2) * speed - speed / 2.
+        velocity = self.emission_speed * (0.5 + 0.5 * random.random()) * (np.random.ranf(2) - 0.5)
         damping = 0.5 + 0.5 * random.random()
         position = self.position
         lifetime = self.particle_lifetime * (0.8 + 0.2 * random.random())
-        return Particle(color=color, lifetime=lifetime,
+        size = self.particle_size
+        return Particle(color=color, lifetime=lifetime, size=size,
                         position=position, velocity=velocity, damping=damping)
 
     def update(self, dt):
@@ -81,12 +92,12 @@ class ParticleEmitter(PhysicalObject):
         batch.draw()
 
 class Particle(PhysicalObject):
-    def __init__(self, color, lifetime, *args, **kwargs):
+    def __init__(self, color, size, lifetime, *args, **kwargs):
         super(Particle, self).__init__(*args, **kwargs)
         self.color = color
         self.lifetime = lifetime
+        self.size = size
 
-        size = 1
         self.vertices = np.hstack([self.position + [-size, size], self.position + [-size, -size], self.position + [size, 0]])
         self.vertices_colors = np.hstack([self.color] * 3)
 
