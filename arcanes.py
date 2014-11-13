@@ -9,8 +9,8 @@ class GameWindow(pyglet.window.Window):
 
         init_pos = np.array([self.width/2., self.height/2.])
         color = np.array([50, 190, 230])
-        self.particle_emitter = ParticleEmitter(max_particles=2000, particle_lifetime=1., emission_frequency=300.,
-                                                color=color, position=init_pos)
+        self.particle_emitter = ParticleEmitter(max_particles=5000, position=init_pos, particle_lifetime=.5, emission_frequency=600.,
+                                                emission_speed=2.5, particle_size=2,color=color)
         self.particle_emitter.emitting = False
 
         # Update event
