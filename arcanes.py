@@ -18,7 +18,7 @@ class GameWindow(pyglet.window.Window):
         pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
 
         # Update event
-        self.fps = 145.
+        self.fps = 80.
         pyglet.clock.schedule_interval(self.update, 1.0/self.fps)
         pyglet.clock.set_fps_limit(self.fps)
 
