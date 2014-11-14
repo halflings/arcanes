@@ -22,6 +22,9 @@ class GameWindow(pyglet.window.Window):
         pyglet.clock.schedule_interval(self.update, 1.0/self.fps)
         pyglet.clock.set_fps_limit(self.fps)
 
+        # Array used to save the coordinates the mouse went through while casting
+        self.gesture_coordinates = []
+
         # FPS display, for debugging
         self.fps_display = pyglet.clock.ClockDisplay()
 
@@ -35,15 +38,25 @@ class GameWindow(pyglet.window.Window):
     def update(self, dt):
         self.particle_emitter.update(dt)
 
+    def new_position(self, x, y):
+        position = np.array([float(x), float(y)])
+        self.particle_emitter.position = position
+        self.gesture_coordinates.append(position)
+
     def on_mouse_drag(self, x, y, dx, dy, buttons, modifiers):
-        self.particle_emitter.position = np.array([float(x), float(y)])
+        self.new_position(x, y)
 
     def on_mouse_press(self, x, y, button, modifiers):
-        self.particle_emitter.position = np.array([float(x), float(y)])
+        self.new_position(x, y)
         self.particle_emitter.emitting = True
 
     def on_mouse_release(self, x, y, button, modifiers):
         self.particle_emitter.emitting = False
+
+        # TODO: exploit the gesture's coordinates
+
+        # Resetting the gesture coordinates
+        self.gesture_coordinates = []
 
 if __name__ == '__main__':
     window = GameWindow(width=800, height=600)
