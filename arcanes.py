@@ -18,13 +18,19 @@ class GameWindow(pyglet.window.Window):
         # Setting up the particle emitter
         init_pos = np.array([self.width/2., self.height/2.])
         color = np.array([190, 190, 255])
-        self.particle_emitter = ParticleEmitter(max_particles=4000, position=init_pos, particle_lifetime=1., emission_frequency=200.,
-                                                emission_speed=1.5, particle_size=1, color=color)
+        self.particle_emitter = ParticleEmitter(max_particles=4000, position=init_pos, particle_lifetime=1., emission_frequency=500.,
+                                                emission_speed=1.5, particle_size=2, color=color)
         self.particle_emitter.emitting = False
 
         # Background image
         self.bg_texture = pyglet.resource.image('stone.png')
         self.bg_tiling = pyglet.image.TileableTexture.create_for_image(self.bg_texture)
+
+        # Enemy image
+        self.enemy_image = pyglet.resource.image('orc.png')
+        x_init = (self.width-self.enemy_image.width)/2
+        y_init = self.height - self.enemy_image.height
+        self.enemy_sprite = pyglet.sprite.Sprite(self.enemy_image, x=x_init, y=y_init)
 
         # Update event
         self.fps = 80.
@@ -41,6 +47,7 @@ class GameWindow(pyglet.window.Window):
         self.clear()
 
         self.bg_tiling.blit_tiled(0, 0, 0, self.width, self.height)
+        self.enemy_sprite.draw()
 
         self.particle_emitter.draw()
 
