@@ -17,9 +17,9 @@ class GameWindow(pyglet.window.Window):
 
         # Setting up the particle emitter
         init_pos = np.array([self.width/2., self.height/2.])
-        color = np.array([50, 190, 230])
-        self.particle_emitter = ParticleEmitter(max_particles=5000, position=init_pos, particle_lifetime=.5, emission_frequency=600.,
-                                                emission_speed=2.5, particle_size=2, color=color)
+        color = np.array([190, 190, 255])
+        self.particle_emitter = ParticleEmitter(max_particles=4000, position=init_pos, particle_lifetime=1., emission_frequency=200.,
+                                                emission_speed=1.5, particle_size=1, color=color)
         self.particle_emitter.emitting = False
 
         # Background image
