@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import pyglet
 
@@ -15,6 +17,12 @@ class GameWindow(pyglet.window.Window):
         pyglet.resource.path = ['images']
         pyglet.resource.reindex()
 
+        # Setting-up the clock / max FPS / update event
+        self.fps = 80.
+        self.time = 0.
+        pyglet.clock.schedule_interval(self.update, 1.0/self.fps)
+        pyglet.clock.set_fps_limit(self.fps)
+
         # Setting up the particle emitter
         init_pos = np.array([self.width/2., self.height/2.])
         color = np.array([190, 190, 255])
@@ -28,19 +36,16 @@ class GameWindow(pyglet.window.Window):
 
         # Enemy image
         self.enemy_image = pyglet.resource.image('orc.png')
-        x_init = (self.width-self.enemy_image.width)/2
-        y_init = self.height - self.enemy_image.height
-        self.enemy_sprite = pyglet.sprite.Sprite(self.enemy_image, x=x_init, y=y_init)
+        self.enemy_image.anchor_x, self.enemy_image.anchor_y = self.enemy_image.width/2, self.enemy_image.height/2
 
-        # Update event
-        self.fps = 80.
-        pyglet.clock.schedule_interval(self.update, 1.0/self.fps)
-        pyglet.clock.set_fps_limit(self.fps)
+        self.enemy_y = self.height/2 - 50
+        self.enemy_base_scaling = 0.5
+        self.enemy_sprite = pyglet.sprite.Sprite(self.enemy_image, x=self.width/2, y=self.enemy_y)
 
         # Array used to save the coordinates the mouse went through while casting
         self.gesture_coordinates = []
 
-        # FPS display, for debugging
+        # FPS display, for debugging purposes
         self.fps_display = pyglet.clock.ClockDisplay()
 
     def on_draw(self):
@@ -54,7 +59,16 @@ class GameWindow(pyglet.window.Window):
         self.fps_display.draw()
 
     def update(self, dt):
+        self.time += dt
         self.particle_emitter.update(dt)
+
+        time_ratio = math.sin(self.time)
+        self.enemy_sprite.rotation = 5 * time_ratio
+        self.enemy_sprite.y = self.enemy_y + 20 * time_ratio
+        if time_ratio < 0:
+            self.enemy_sprite.scale = self.enemy_base_scaling
+        else:
+            self.enemy_sprite.scale = self.enemy_base_scaling * (1. + 0.25 * time_ratio)
 
     def new_position(self, x, y):
         position = np.array([float(x), float(y)])
