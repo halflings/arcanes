@@ -7,15 +7,24 @@ class GameWindow(pyglet.window.Window):
     def __init__(self, **kwargs):
         super(GameWindow, self).__init__(**kwargs)
 
+        # Setting up OpenGL context
+        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+        pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
+
+        # Setting the resource path
+        pyglet.resource.path = ['images']
+        pyglet.resource.reindex()
+
+        # Setting up the particle emitter
         init_pos = np.array([self.width/2., self.height/2.])
         color = np.array([50, 190, 230])
         self.particle_emitter = ParticleEmitter(max_particles=5000, position=init_pos, particle_lifetime=.5, emission_frequency=600.,
                                                 emission_speed=2.5, particle_size=2, color=color)
         self.particle_emitter.emitting = False
 
-        # Setting up OpenGL context
-        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-        pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
+        # Background image
+        self.bg_texture = pyglet.resource.image('stone.png')
+        self.bg_tiling = pyglet.image.TileableTexture.create_for_image(self.bg_texture)
 
         # Update event
         self.fps = 80.
@@ -30,6 +39,8 @@ class GameWindow(pyglet.window.Window):
 
     def on_draw(self):
         self.clear()
+
+        self.bg_tiling.blit_tiled(0, 0, 0, self.width, self.height)
 
         self.particle_emitter.draw()
 
